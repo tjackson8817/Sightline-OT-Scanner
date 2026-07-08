@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sightline — OT OSINT Exposure Report</title>
+<style>
+  :root {
+    --bg: #f5f6f4;
+    --surface: #ffffff;
+    --surface-2: #eef0ed;
+    --ink: #1c2124;
+    --ink-soft: #565f5f;
+    --ink-mute: #8a928f;
+    --border: #dcdfda;
+    --accent: #1f4b5c;
+    --accent-soft: #e4edef;
+    --critical: #b3261e; --critical-bg: #fbeceb;
+    --high: #a4650a; --high-bg: #faf0e0;
+    --medium: #2f6690; --medium-bg: #e8eef3;
+    --low: #5f6864; --low-bg: #eceeec;
+    --info: #3d6b47; --info-bg: #e8f2ea;
+    --mono: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); line-height: 1.5; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+
+  .masthead { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 1rem; }
+  .wordmark h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin: 0; font-family: Georgia, "Times New Roman", serif; }
+  .wordmark span.tag { font-size: 13px; color: var(--ink-soft); font-family: var(--mono); display: block; margin-top: 2px; }
+
+  .fence { display: flex; gap: 3px; margin: 1rem 0 1.75rem; height: 14px; align-items: flex-end; }
+  .fence span { width: 3px; background: var(--accent); opacity: 0.35; }
+  .fence span:nth-child(4n) { height: 14px; opacity: 0.7; }
+  .fence span:not(:nth-child(4n)) { height: 8px; }
+
+  .picker-row { display: flex; gap: 10px; align-items: center; margin-bottom: 1.75rem; flex-wrap: wrap; }
+  select {
+    font-size: 14px; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--ink); font-family: var(--sans); min-width: 260px;
+  }
+  .btn { font-size: 13px; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+  .btn.secondary { background: var(--surface); color: var(--accent); }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.4rem 1.5rem; margin-bottom: 1.25rem; }
+  .card h2 { font-size: 16px; margin: 0 0 4px; }
+  .card .sub { font-size: 13px; color: var(--ink-mute); margin: 0 0 1rem; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 1.25rem; }
+  .kpi { background: var(--surface-2); border-radius: var(--radius); padding: 1rem 1.1rem; }
+  .kpi .label { font-size: 12.5px; color: var(--ink-mute); margin: 0 0 6px; }
+  .kpi .value { font-size: 25px; font-weight: 700; margin: 0; letter-spacing: -0.01em; }
+
+  .exec-summary { font-size: 14.5px; color: var(--ink-soft); line-height: 1.6; }
+
+  .badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .badge { font-size: 11.5px; padding: 3px 10px; border-radius: 6px; font-weight: 600; }
+  .badge.critical { background: var(--critical-bg); color: var(--critical); }
+  .badge.high { background: var(--high-bg); color: var(--high); }
+  .badge.medium { background: var(--medium-bg); color: var(--medium); }
+  .badge.low { background: var(--low-bg); color: var(--low); }
+  .badge.informational { background: var(--info-bg); color: var(--info); }
+  .badge.category { background: var(--surface-2); color: var(--ink-soft); font-weight: 500; }
+
+  .finding-title { font-size: 15px; font-weight: 600; margin: 0 0 5px; }
+  .finding-desc { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 10px; }
+  .tech { border-top: 1px solid var(--border); padding-top: 10px; margin-top: 4px; }
+  .tech-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-mute); margin: 0 0 6px; }
+  .tech p { font-size: 12.5px; color: var(--ink-soft); margin: 0 0 6px; }
+  .tech code { font-family: var(--mono); font-size: 11.5px; background: var(--surface-2); padding: 1px 6px; border-radius: 5px; }
+  .tech pre { font-family: var(--mono); font-size: 11px; color: var(--ink-mute); background: var(--surface-2); border-radius: 6px; padding: 8px 10px; overflow-x: auto; margin: 4px 0 0; }
+
+  .empty { text-align: center; padding: 3rem 1rem; color: var(--ink-mute); font-size: 14px; }
+
+  footer.note { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 12px; color: var(--ink-mute); }
+  footer.note code { font-family: var(--mono); background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+
+  @media print {
+    .picker-row, .btn { display: none !important; }
+    body { background: #fff; }
+    .card { border: none; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="wordmark">
+      <h1>Sightline</h1>
+      <span class="tag">OT OSINT exposure report</span>
+    </div>
+  </div>
+  <div class="fence" id="fence"></div>
+
+  <div class="picker-row">
+    <select id="reportPicker" onchange="loadSelectedReport()">
+      <option value="">Loading reports…</option>
+    </select>
+    <button class="btn secondary" onclick="window.print()">Print / save as PDF</button>
+  </div>
+
+  <div id="reportView">
+    <div class="empty">No report selected yet.</div>
+  </div>
+
+  <footer class="note">
+    All findings come from free, public data sources: certificate transparency logs, public DNS,
+    and the company's own website. No personal information about named individuals is collected —
+    the leadership-page check only confirms such a page exists, it does not extract names.
+    Severity ratings are rule-based (see <code>scripts/osint_scan.py</code>), not AI-generated.
+    To scan a new company, run the <code>Run OT OSINT Scan</code> GitHub Action with the company's
+    name and domain — see README.
+  </footer>
+</div>
+
+<script>
+function renderFence() {
+  document.getElementById("fence").innerHTML = Array.from({length: 48}).map(() => "<span></span>").join("");
+}
+
+let manifest = [];
+
+async function loadManifest() {
+  const picker = document.getElementById("reportPicker");
+  try {
+    const res = await fetch("data/reports/manifest.json", { cache: "no-store" });
+    manifest = await res.json();
+  } catch (e) {
+    manifest = [];
+  }
+
+  if (!manifest.length) {
+    picker.innerHTML = `<option value="">No scans yet — run the GitHub Action to add one</option>`;
+    return;
+  }
+
+  picker.innerHTML = manifest.map(m =>
+    `<option value="${m.slug}">${m.company} — ${new Date(m.scan_date).toLocaleDateString()} (${m.total_findings} findings)</option>`
+  ).join("");
+  loadSelectedReport();
+}
+
+async function loadSelectedReport() {
+  const slug = document.getElementById("reportPicker").value;
+  if (!slug) {
+    document.getElementById("reportView").innerHTML = `<div class="empty">No report selected yet.</div>`;
+    return;
+  }
+  try {
+    const res = await fetch(`data/reports/${slug}.json`, { cache: "no-store" });
+    const report = await res.json();
+    renderReport(report);
+  } catch (e) {
+    document.getElementById("reportView").innerHTML = `<div class="empty">Couldn't load that report.</div>`;
+  }
+}
+
+function severityLabel(sev) {
+  return sev.charAt(0).toUpperCase() + sev.slice(1);
+}
+
+function buildExecSummary(report) {
+  const s = report.summary.by_severity || {};
+  const critical = s.critical || 0;
+  const high = s.high || 0;
+  const total = report.summary.total_findings;
+
+  if (total === 0) {
+    return `No public exposure findings were identified for ${report.company} at the time of this scan. This reflects what free, public data sources currently show — it is not a guarantee of no exposure, and periodic re-scanning is recommended.`;
+  }
+
+  let urgency;
+  if (critical > 0) {
+    urgency = `including ${critical} critical finding${critical === 1 ? "" : "s"} that warrant prompt attention`;
+  } else if (high > 0) {
+    urgency = `including ${high} high-severity finding${high === 1 ? "" : "s"} worth prioritizing`;
+  } else {
+    urgency = "none rated critical or high severity at this time";
+  }
+
+  return `This scan identified ${total} finding${total === 1 ? "" : "s"} related to ${report.company}'s public-facing footprint, ${urgency}. Findings span certificate-transparency-based OT/ICS subdomain exposure, domain impersonation risk, and publicly available leadership information relevant to phishing and whaling risk. Full detail, evidence, and recommendations for each finding are below.`;
+}
+
+function renderReport(report) {
+  const s = report.summary.by_severity || {};
+  const kpiHTML = `
+    <div class="kpi"><p class="label">Total findings</p><p class="value">${report.summary.total_findings}</p></div>
+    <div class="kpi"><p class="label">Critical</p><p class="value" style="color:var(--critical);">${s.critical || 0}</p></div>
+    <div class="kpi"><p class="label">High</p><p class="value" style="color:var(--high);">${s.high || 0}</p></div>
+    <div class="kpi"><p class="label">Medium</p><p class="value" style="color:var(--medium);">${s.medium || 0}</p></div>
+  `;
+
+  const findingsHTML = report.findings.length ? report.findings.map(f => {
+    const evidenceLines = Object.entries(f.evidence || {}).map(([k, v]) =>
+      `${k}: ${Array.isArray(v) ? v.join(", ") || "(none)" : v}`
+    ).join("\n");
+    return `
+    <div class="card">
+      <div class="badge-row">
+        <span class="badge ${f.severity}">${severityLabel(f.severity)}</span>
+        <span class="badge category">${f.category}</span>
+        <span class="badge category">CSF: ${f.csf_function}</span>
+      </div>
+      <p class="finding-title">${f.title}</p>
+      <p class="finding-desc">${f.description}</p>
+      <div class="tech">
+        <p class="tech-label">Recommendation</p>
+        <p>${f.recommendation}</p>
+        <p class="tech-label" style="margin-top:10px;">Evidence</p>
+        <pre>${evidenceLines}</pre>
+      </div>
+    </div>`;
+  }).join("") : `<div class="card"><p class="finding-desc">No findings in this scan.</p></div>`;
+
+  document.getElementById("reportView").innerHTML = `
+    <div class="card">
+      <h2>${report.company}</h2>
+      <p class="sub">${report.domain} · ${report.industry} · Scanned ${new Date(report.scan_date).toLocaleString()}</p>
+      <div class="kpi-row">${kpiHTML}</div>
+      <p class="exec-summary">${buildExecSummary(report)}</p>
+    </div>
+    ${findingsHTML}
+  `;
+}
+
+renderFence();
+loadManifest();
+</script>
+</body>
+</html>
