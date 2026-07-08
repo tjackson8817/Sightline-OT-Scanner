@@ -1,0 +1,67 @@
+{
+  "company": "Sea Land Energy",
+  "domain": "www.sealandenergymaine.com",
+  "industry": "Oil and Gas",
+  "scan_date": "2026-07-08T17:33:03.076999+00:00",
+  "findings": [
+    {
+      "id": "F002",
+      "category": "Domain Impersonation Risk",
+      "title": "Lookalike domain is registered and resolving: www.io",
+      "description": "'www.io' closely resembles your primary domain 'www.sealandenergymaine.com' and currently resolves to an active IP address. This domain also has mail servers configured, meaning it is capable of sending email \u2014 treat this as active phishing infrastructure risk, not just a passively registered lookalike.",
+      "severity": "critical",
+      "csf_function": "GOVERN",
+      "recommendation": "Treat as a probable phishing/impersonation risk. Consider defensive registration of close variants, report the domain to your registrar or a brand-protection service if it appears malicious, and alert staff \u2014 especially finance and executive assistants \u2014 about this specific lookalike domain.",
+      "evidence": {
+        "domain": "www.io",
+        "has_mx": true
+      }
+    },
+    {
+      "id": "F004",
+      "category": "Domain Impersonation Risk",
+      "title": "Lookalike domain is registered and resolving: www.org",
+      "description": "'www.org' closely resembles your primary domain 'www.sealandenergymaine.com' and currently resolves to an active IP address. This domain also has mail servers configured, meaning it is capable of sending email \u2014 treat this as active phishing infrastructure risk, not just a passively registered lookalike.",
+      "severity": "critical",
+      "csf_function": "GOVERN",
+      "recommendation": "Treat as a probable phishing/impersonation risk. Consider defensive registration of close variants, report the domain to your registrar or a brand-protection service if it appears malicious, and alert staff \u2014 especially finance and executive assistants \u2014 about this specific lookalike domain.",
+      "evidence": {
+        "domain": "www.org",
+        "has_mx": true
+      }
+    },
+    {
+      "id": "F001",
+      "category": "Domain Impersonation Risk",
+      "title": "Lookalike domain is registered and resolving: www.info",
+      "description": "'www.info' closely resembles your primary domain 'www.sealandenergymaine.com' and currently resolves to an active IP address. No mail server is configured for this domain, which somewhat lowers immediate phishing risk, but it should still be monitored, since mail capability can be added at any time.",
+      "severity": "medium",
+      "csf_function": "GOVERN",
+      "recommendation": "Monitor this domain periodically for changes (e.g., mail servers being added). Defensive registration of high-risk variants is a reasonable low-cost precaution.",
+      "evidence": {
+        "domain": "www.info",
+        "has_mx": false
+      }
+    },
+    {
+      "id": "F003",
+      "category": "Domain Impersonation Risk",
+      "title": "Lookalike domain is registered and resolving: www.net",
+      "description": "'www.net' closely resembles your primary domain 'www.sealandenergymaine.com' and currently resolves to an active IP address. No mail server is configured for this domain, which somewhat lowers immediate phishing risk, but it should still be monitored, since mail capability can be added at any time.",
+      "severity": "medium",
+      "csf_function": "GOVERN",
+      "recommendation": "Monitor this domain periodically for changes (e.g., mail servers being added). Defensive registration of high-risk variants is a reasonable low-cost precaution.",
+      "evidence": {
+        "domain": "www.net",
+        "has_mx": false
+      }
+    }
+  ],
+  "summary": {
+    "total_findings": 4,
+    "by_severity": {
+      "critical": 2,
+      "medium": 2
+    }
+  }
+}
